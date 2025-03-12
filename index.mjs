@@ -1,0 +1,3 @@
+import someModule from './someModule.mjs';
+// ...existing code...
+export default someFunction;
