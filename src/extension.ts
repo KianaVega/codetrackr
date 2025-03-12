@@ -4,7 +4,6 @@ import fetch from 'node-fetch';
 import simpleGit, { SimpleGit } from 'simple-git';
 import * as console from 'console';
 
-
 const GITHUB_CLIENT_ID = 'YOUR_GITHUB_CLIENT_ID';
 const GITHUB_CLIENT_SECRET = 'YOUR_GITHUB_CLIENT_SECRET';
 const GITHUB_REDIRECT_URI = 'http://localhost:3000/callback'; // Update with your redirect URI
@@ -27,7 +26,6 @@ async function authenticateWithGitHub() {
     }
 
     try {
-        // Exchange code for an access token
         const response = await fetch('https://github.com/login/oauth/access_token', {
             method: 'POST',
             headers: {
@@ -70,9 +68,15 @@ async function initializeGitRepo(accessToken: string) {
 
         const repoUrl = response.data.clone_url;
 
-        // Initialize local Git repo
-        await git.init();
+        // Initialize local Git repo if not already initialized
+        const status = await git.status();
+
+        // Check if there's a .git directory to determine if it's a Git repository
+        if (status.not_added.length === 0 && status.created.length === 0 && status.modified.length === 0) {
+            await git.init();  // Initialize if it's not a git repo
+        }
         await git.addRemote('origin', repoUrl);
+        
         vscode.window.showInformationMessage('CodeTracking repository initialized!');
     } catch (error) {
         vscode.window.showErrorMessage('Failed to initialize Git repository.');
@@ -88,53 +92,46 @@ function startActivityTracking() {
 
     let activityTimer: NodeJS.Timeout | undefined;
 
-    function startActivityTracking() {
-        const config = vscode.workspace.getConfiguration('codetrackr');
-        const commitInterval = config.get<number>('commitInterval', 30);
-        const excludePaths = config.get<string[]>('excludePaths', ["node_modules", "dist", ".git"]);
-    
-        vscode.workspace.onDidChangeTextDocument((event) => {
-            // Skip tracking if file is in an excluded directory
-            if (excludePaths.some(path => event.document.fileName.includes(path))) {
-                return;
-            }
-            console.log('Tracked file change:', event.document.fileName);
-        });
-    
-        // Set commit timer
-        if (activityTimer) {
-            clearInterval(activityTimer);
+    const config = vscode.workspace.getConfiguration('codetrackr');
+    const commitInterval = config.get<number>('commitInterval', 30);
+    const excludePaths = config.get<string[]>('excludePaths', ["node_modules", "dist", ".git"]);
+
+    vscode.workspace.onDidChangeTextDocument((event) => {
+        // Skip tracking if file is in an excluded directory
+        if (excludePaths.some(path => event.document.fileName.includes(path))) {
+            return;
         }
-        activityTimer = setInterval(commitActivitySummary, commitInterval * 60 * 1000);
+        console.log('Tracked file change:', event.document.fileName);
+    });
+
+    // Set commit timer
+    if (activityTimer) {
+        clearInterval(activityTimer);
     }
+    activityTimer = setInterval(commitActivitySummary, commitInterval * 60 * 1000);
     
     async function commitActivitySummary() {
         try {
-            const config = vscode.workspace.getConfiguration('codetrackr');
-            const excludePaths = config.get<string[]>('excludePaths', ["node_modules", "dist", ".git"]);
-    
-            // Add all files except excluded ones
             const gitStatus = await git.status();
             const filteredFiles = gitStatus.files.filter(file => 
                 !excludePaths.some(path => file.path.includes(path))
             ).map(file => file.path);
-    
+
             if (filteredFiles.length === 0) {
                 console.log('No changes to commit.');
                 return;
             }
-    
+
             await git.add(filteredFiles);
             await git.commit(`Auto-commit: ${new Date().toLocaleString()}`);
             await git.push('origin', 'main');
-    
+
             vscode.window.showInformationMessage('Auto-committed work progress.');
         } catch (error) {
             vscode.window.showErrorMessage('Failed to commit changes.');
             console.error(error);
         }
     }
-    
 }
 
 // 🔹 Fetch GitHub Commits
@@ -180,10 +177,10 @@ async function getCommitsFromGithub() {
 
 // 🔹 Activate Extension
 export function activate(context: vscode.ExtensionContext) {
-    console.log('CodeTrackr is now active!');
-
+    console.log('CodeTrackr extension activated!'); // Add this line
     context.subscriptions.push(
         vscode.commands.registerCommand('codetrackr.initialize', async () => {
+            console.log('Initialize CodeTrackr command triggered'); // Add this line
             const accessToken = await authenticateWithGitHub();
             if (accessToken) {
                 await initializeGitRepo(accessToken);
@@ -199,5 +196,3 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
     console.log('CodeTrackr has been deactivated');
 }
-
-

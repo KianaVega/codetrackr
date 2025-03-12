@@ -1,85 +1,92 @@
 {
-    "name": "codetrackr",
-    "displayName": "CodeTrackr",
-    "description": "A VS Code extension to track your coding activities.",
-    "version": "0.0.1",
-    "publisher": "kianavega",
-    "main": "./out/extension.js",
-    "scripts": {
-        "start": "code --extensionDevelopmentPath=./",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "package": "vsce package",
-        "pretest": "npm run compile && npm run lint",
-        "test": "tsc -p ./ && node ./out/test/runTest.js",
-        "vscode:prepublish": "npm run compile",
-        "prepublishOnly": "npm run compile",
-        "lint": "eslint src --ext ts"
-    },
-    "engines": {
-        "vscode": "^1.80.0"
-    },
-    "activationEvents": ["onStartupFinished"],
-    "contributes": {
-        "configuration": {
-            "title": "CodeTrackr",
-            "properties": {
-                "codetrackr.commitInterval": {
-                    "type": "number",
-                    "default": 30,
-                    "description": "Interval (in minutes) for automatic commits."
-                },
-                "codetrackr.excludePaths": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": ["node_modules", "dist", ".git"],
-                    "description": "List of files or directories to exclude from tracking."
-                }
-            }
+  "name": "codetrackr",
+  "displayName": "CodeTrackr",
+  "description": "A VS Code extension to track your coding activities.",
+  "version": "0.0.2",
+  "publisher": "kianavega",
+  "main": "./out/extension.js",
+  "scripts": {
+    "start": "code --extensionDevelopmentPath=./",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "pretest": "npm run compile && npm run lint",
+    "test": "tsc -p ./ && node ./out/test/runTest.js",
+    "vscode:prepublish": "npm run compile",
+    "prepublishOnly": "npm run compile",
+    "lint": "eslint src --ext ts"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "activationEvents": [
+    "onCommand:codetrackr.initialize"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "codetrackr.initialize",
+        "title": "Initialize CodeTrackr"
+      }
+    ],
+    "configuration": {
+      "title": "CodeTrackr",
+      "properties": {
+        "codetrackr.commitInterval": {
+          "type": "number",
+          "default": 30,
+          "description": "Interval (in minutes) for automatic commits."
+        },
+        "codetrackr.excludePaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": ["node_modules", "dist", ".git"],
+          "description": "List of files or directories to exclude from tracking."
         }
-    },
-    "devDependencies": {
-        "@eslint/js": "^9.22.0",
-        "@types/chai": "^4.2.0",
-        "@types/jest": "^26.0.24",
-        "@types/mocha": "^10.0.10",
-        "@types/node": "^14.18.63",
-        "@types/sinon": "^17.0.4",
-        "@types/vscode": "^1.50.0",
-        "@typescript-eslint/eslint-plugin": "^8.26.1",
-        "@typescript-eslint/parser": "^8.26.1",
-        "@vscode/test-electron": "^2.4.1",
-        "eslint": "^9.22.0",
-        "minimatch": "^3.0.5",
-        "minimist": "^1.2.5",
-        "mkdirp": "^1.0.4",
-        "mocha": "^11.1.0",
-        "mock-require": "^3.0.3",
-        "sinon": "^19.0.2",
-        "ts-mockito": "^2.6.1",
-        "ts-node": "^10.9.2",
-        "typescript": "^4.0.3",
-        "vscode-test": "^1.6.1"
-    },
-    "dependencies": {
-        "@octokit/rest": "^21.1.1",
-        "@types/node-fetch": "^2.5.12",
-        "@vscode/extension-telemetry": "^0.9.8",
-        "axios": "^1.8.2",
-        "chai": "^4.2.0",
-        "node-fetch": "^2.7.0",
-        "simple-git": "^3.27.0"
-    },
-    "resolutions": {
-        "minimatch": "^3.0.5",
-        "minimist": "^1.2.5"
-    },
-    "repository": {
-  "type": "git",
-  "url": "https://github.com/kianavega/codetrackr"
-}
-
+      }
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@types/chai": "^4.2.0",
+    "@types/jest": "^26.0.24",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^14.18.63",
+    "@types/sinon": "^17.0.4",
+    "@types/vscode": "^1.50.0",
+    "@typescript-eslint/eslint-plugin": "^8.26.1",
+    "@typescript-eslint/parser": "^8.26.1",
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.22.0",
+    "minimatch": "^3.0.5",
+    "minimist": "^1.2.5",
+    "mkdirp": "^1.0.4",
+    "mocha": "^11.1.0",
+    "mock-require": "^3.0.3",
+    "sinon": "^19.0.2",
+    "ts-mockito": "^2.6.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^4.0.3",
+    "vscode-test": "^1.6.1"
+  },
+  "dependencies": {
+    "@octokit/rest": "^21.1.1",
+    "@types/node-fetch": "^2.5.12",
+    "@vscode/extension-telemetry": "^0.9.8",
+    "axios": "^1.8.2",
+    "chai": "^4.2.0",
+    "node-fetch": "^2.7.0",
+    "simple-git": "^3.27.0"
+  },
+  "resolutions": {
+    "minimatch": "^3.0.5",
+    "minimist": "^1.2.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kianavega/codetrackr"
+  }
 }
 
