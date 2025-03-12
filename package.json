@@ -5,6 +5,9 @@
   "version": "0.0.3",
   "publisher": "kianavega",
   "main": "./out/extension.js",
+  "activationEvents": [
+    "onCommand:codetrackr.initialize"
+  ],
   "scripts": {
     "start": "code --extensionDevelopmentPath=./",
     "compile": "tsc -p ./",
