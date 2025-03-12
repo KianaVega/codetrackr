@@ -3,7 +3,7 @@
     "displayName": "CodeTrackr",
     "description": "A VS Code extension to track your coding activities.",
     "version": "0.0.1",
-    "publisher": "undefined_publisher",
+    "publisher": "kianavega",
     "main": "./out/extension.js",
     "scripts": {
         "start": "code --extensionDevelopmentPath=./",
@@ -17,14 +17,29 @@
         "lint": "eslint src --ext ts"
     },
     "engines": {
-        "vscode": "^1.50.0"
+        "vscode": "^1.80.0"
     },
-    "activationEvents": [
-        "onCommand:codetrackr.initializeRepo",
-        "onCommand:codetrackr.startTracking",
-        "onCommand:codetrackr.authenticateWithGitHub",
-        "onCommand:codetrackr.getCommits"
-    ],
+    "activationEvents": ["onStartupFinished"],
+    "contributes": {
+        "configuration": {
+            "title": "CodeTrackr",
+            "properties": {
+                "codetrackr.commitInterval": {
+                    "type": "number",
+                    "default": 30,
+                    "description": "Interval (in minutes) for automatic commits."
+                },
+                "codetrackr.excludePaths": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": ["node_modules", "dist", ".git"],
+                    "description": "List of files or directories to exclude from tracking."
+                }
+            }
+        }
+    },
     "devDependencies": {
         "@eslint/js": "^9.22.0",
         "@types/chai": "^4.2.0",
@@ -51,6 +66,7 @@
     "dependencies": {
         "@octokit/rest": "^21.1.1",
         "@types/node-fetch": "^2.5.12",
+        "@vscode/extension-telemetry": "^0.9.8",
         "axios": "^1.8.2",
         "chai": "^4.2.0",
         "node-fetch": "^2.7.0",
@@ -60,16 +76,10 @@
         "minimatch": "^3.0.5",
         "minimist": "^1.2.5"
     },
-    "contributes": {
-        "commands": [
-            {
-                "command": "codetrackr.showWelcome",
-                "title": "Show Welcome"
-            },
-            {
-                "command": "codetrackr.getCommit",
-                "title": "Get Commit from GitHub"
-            }
-        ]
-    }
+    "repository": {
+  "type": "git",
+  "url": "https://github.com/kianavega/codetrackr"
 }
+
+}
+
