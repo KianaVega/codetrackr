@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "start": "code --extensionDevelopmentPath=./",
-    "compile": "tsc -p ./ && copy process.env .\\out\\.env",
+    "compile": "tsc -p ./ && if exist src\\.env copy src\\.env .\\out\\.env",
     "watch": "tsc -watch -p ./",
     "package": "vsce package",
     "pretest": "npm run compile && npm run lint",
