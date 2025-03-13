@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "start": "code --extensionDevelopmentPath=./",
-    "compile": "tsc -p ./",
+    "compile": "tsc -p ./ && copy process.env .\\out\\.env",
     "watch": "tsc -watch -p ./",
     "package": "vsce package",
     "pretest": "npm run compile && npm run lint",
@@ -69,6 +69,7 @@
     "@typescript-eslint/eslint-plugin": "^8.26.1",
     "@typescript-eslint/parser": "^8.26.1",
     "eslint": "^9.22.0",
+    "eslint-plugin-node": "^11.1.0",
     "mocha": "^11.1.0",
     "sinon": "^19.0.2",
     "ts-node": "^10.9.2",

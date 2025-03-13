@@ -1,11 +1,15 @@
 import * as vscode from 'vscode';
-import { Octokit } from '@octokit/rest';
-import fetch from 'node-fetch'; // Now TypeScript will recognize the types
+import fetch from 'node-fetch';
 import simpleGit, { SimpleGit } from 'simple-git';
 import * as dotenv from 'dotenv';
 
 // Load environment variables from .env file
 dotenv.config();
+
+// Debugging: Log environment variables
+console.log('GITHUB_CLIENT_ID:', process.env.GITHUB_CLIENT_ID);
+console.log('GITHUB_CLIENT_SECRET:', process.env.GITHUB_CLIENT_SECRET);
+console.log('GITHUB_REDIRECT_URI:', process.env.GITHUB_REDIRECT_URI);
 
 // Define GitHub OAuth credentials
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
@@ -72,6 +76,7 @@ async function authenticateWithGitHub() {
 async function initializeGitRepo(accessToken: string) {
     try {
         vscode.window.showInformationMessage('Creating GitHub repository...');
+        const { Octokit } = await import('@octokit/rest'); // Use dynamic import
         const octokit = new Octokit({ auth: accessToken });
         const response = await octokit.repos.createForAuthenticatedUser({
             name: 'CodeTracking',
