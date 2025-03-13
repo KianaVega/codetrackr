@@ -2,16 +2,26 @@ import * as vscode from 'vscode';
 import fetch from 'node-fetch';
 import simpleGit, { SimpleGit } from 'simple-git';
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
+import * as path from 'path';
 
-// Load environment variables from .env file
-dotenv.config();
+// Load environment variables
+const envPath = path.resolve(__dirname, '../.env'); // Ensure this points to the correct path
+if (!fs.existsSync(envPath)) {
+    console.error('🚨 ERROR: .env file missing at', envPath);
+} else {
+    dotenv.config({ path: envPath });  // Ensure dotenv loads the file from the correct path
+    console.log('✅ .env file loaded');
+}
 
-// Debugging: Log environment variables
+// Debugging the environment variables
 console.log('GITHUB_CLIENT_ID:', process.env.GITHUB_CLIENT_ID);
 console.log('GITHUB_CLIENT_SECRET:', process.env.GITHUB_CLIENT_SECRET);
 console.log('GITHUB_REDIRECT_URI:', process.env.GITHUB_REDIRECT_URI);
+console.log('Environment Variables:', process.env);
 
-// Define GitHub OAuth credentials
+
+// GitHub OAuth Configuration
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const GITHUB_REDIRECT_URI = process.env.GITHUB_REDIRECT_URI || 'http://localhost:3000/callback';
@@ -29,10 +39,8 @@ async function authenticateWithGitHub() {
     const authUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${GITHUB_REDIRECT_URI}&scope=repo`;
     vscode.env.openExternal(vscode.Uri.parse(authUrl));
 
-    vscode.window.showInformationMessage('Prompting user for authorization code...');
-    const code = await vscode.window.showInputBox({
-        prompt: 'Enter the authorization code from GitHub',
-    });
+    vscode.window.showInformationMessage('Enter the GitHub authorization code:');
+    const code = await vscode.window.showInputBox({ prompt: 'Enter the authorization code from GitHub' });
 
     if (!code) {
         vscode.window.showErrorMessage('No authorization code provided.');
@@ -40,7 +48,6 @@ async function authenticateWithGitHub() {
     }
 
     try {
-        vscode.window.showInformationMessage('Fetching access token from GitHub...');
         const response = await fetch('https://github.com/login/oauth/access_token', {
             method: 'POST',
             headers: {
@@ -59,15 +66,11 @@ async function authenticateWithGitHub() {
             vscode.window.showInformationMessage('GitHub authentication successful!');
             return data.access_token;
         } else {
-            vscode.window.showErrorMessage('Failed to get access token. Please check your credentials.');
+            vscode.window.showErrorMessage('Failed to get access token.');
             return null;
         }
     } catch (error) {
-        if (error instanceof Error) {
-            vscode.window.showErrorMessage(`GitHub authentication error: ${error.message}`);
-        } else {
-            vscode.window.showErrorMessage('An unknown error occurred during GitHub authentication.');
-        }
+        vscode.window.showErrorMessage(`GitHub authentication error: ${error instanceof Error ? error.message : 'Unknown error'}`);
         return null;
     }
 }
@@ -76,8 +79,9 @@ async function authenticateWithGitHub() {
 async function initializeGitRepo(accessToken: string) {
     try {
         vscode.window.showInformationMessage('Creating GitHub repository...');
-        const { Octokit } = await import('@octokit/rest'); // Use dynamic import
+        const { Octokit } = await import('@octokit/rest');
         const octokit = new Octokit({ auth: accessToken });
+
         const response = await octokit.repos.createForAuthenticatedUser({
             name: 'CodeTracking',
             private: true,
@@ -91,11 +95,7 @@ async function initializeGitRepo(accessToken: string) {
         await git.addRemote('origin', repoUrl);
         vscode.window.showInformationMessage('Local Git repository initialized and remote added.');
     } catch (error) {
-        if (error instanceof Error) {
-            vscode.window.showErrorMessage(`Error initializing Git repository: ${error.message}`);
-        } else {
-            vscode.window.showErrorMessage('An unknown error occurred while initializing the Git repository.');
-        }
+        vscode.window.showErrorMessage(`Error initializing Git repository: ${error instanceof Error ? error.message : 'Unknown error'}`);
         throw error;
     }
 }
@@ -103,7 +103,6 @@ async function initializeGitRepo(accessToken: string) {
 // 🔹 Start Activity Tracking
 function startActivityTracking() {
     vscode.window.showInformationMessage('Starting activity tracking...');
-
     vscode.workspace.onDidChangeTextDocument((event) => {
         console.log('File changed:', event.document.fileName);
     });
@@ -115,16 +114,12 @@ function startActivityTracking() {
     activityTimer = setInterval(async () => {
         console.log('Committing activity summary...');
         try {
-            await git.add('.');
-            await git.commit(`Auto-commit: ${new Date().toLocaleString()}`);
-            await git.push('origin', 'main');
+            await git.add('.');  // Stage all changes
+            await git.commit(`Auto-commit: ${new Date().toLocaleString()}`);  // Commit with the timestamp
+            await git.push('origin', 'main');  // Push to the remote
             vscode.window.showInformationMessage('Activity summary committed.');
         } catch (error) {
-            if (error instanceof Error) {
-                vscode.window.showErrorMessage(`Error committing activity summary: ${error.message}`);
-            } else {
-                vscode.window.showErrorMessage('An unknown error occurred while committing the activity summary.');
-            }
+            vscode.window.showErrorMessage(`Error committing activity summary: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }, commitInterval * 60 * 1000);
 
@@ -135,11 +130,9 @@ function startActivityTracking() {
 export function activate(context: vscode.ExtensionContext) {
     vscode.window.showInformationMessage('CodeTrackr extension activated!');
 
-    // Register the initialize command
     context.subscriptions.push(
         vscode.commands.registerCommand('codetrackr.initialize', async () => {
             try {
-                vscode.window.showInformationMessage('Initialize CodeTrackr command triggered');
                 const accessToken = await authenticateWithGitHub();
                 if (accessToken) {
                     await initializeGitRepo(accessToken);
@@ -150,16 +143,6 @@ export function activate(context: vscode.ExtensionContext) {
             }
         })
     );
-
-    // Register additional commands if needed
-    context.subscriptions.push(
-        vscode.commands.registerCommand('codetrackr.anotherCommand', async () => {
-            // Add logic for another command here if needed
-            vscode.window.showInformationMessage('Another command triggered!');
-        })
-    );
-
-    // Add more commands as necessary
 }
 
 // 🔹 Deactivate Extension
