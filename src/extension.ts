@@ -1,14 +1,20 @@
 import * as vscode from 'vscode';
 import { Octokit } from '@octokit/rest';
-import fetch from 'node-fetch';
+import fetch from 'node-fetch'; // Now TypeScript will recognize the types
 import simpleGit, { SimpleGit } from 'simple-git';
 import * as dotenv from 'dotenv';
+
+// Load environment variables from .env file
 dotenv.config();
 
 // Define GitHub OAuth credentials
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;// Replace with your actual GitHub client secret
-const GITHUB_REDIRECT_URI = 'http://localhost:3000/callback'; // Update with your redirect URI
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+const GITHUB_REDIRECT_URI = process.env.GITHUB_REDIRECT_URI || 'http://localhost:3000/callback';
+
+if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
+    throw new Error('Missing GitHub OAuth configuration in .env file.');
+}
 
 const git: SimpleGit = simpleGit();
 let activityTimer: NodeJS.Timeout | undefined;
