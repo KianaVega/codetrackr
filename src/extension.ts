@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import * as vscode from 'vscode'; 
 import fetch from 'node-fetch';
 import simpleGit from 'simple-git';
 import * as dotenv from 'dotenv';
