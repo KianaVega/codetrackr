@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { Octokit } from '@octokit/rest';  // Updated import
 import fetch from 'node-fetch';
 import simpleGit from 'simple-git';
 import * as dotenv from 'dotenv';
@@ -80,14 +79,19 @@ async function authenticateWithGitHub() {
 async function initializeGitRepo(accessToken: string) {
     try {
         vscode.window.showInformationMessage('Creating GitHub repository...');
+        
+        // Dynamically import @octokit/rest
+        const { Octokit } = await import('@octokit/rest');  // Dynamic import
         const octokit = new Octokit({ auth: accessToken });
 
-        // Create a repository named 'codetracking'
-        const response = await octokit.rest.repos.createForAuthenticatedUser({
+        // Log the attempt to create the repo
+        console.log('Attempting to create GitHub repository...');
+        const response = await octokit.repos.createForAuthenticatedUser({
             name: 'codetracking',
-            private: true,  // Set to true for private repository
+            private: true,
         });
 
+        console.log('GitHub repository created:', response.data);  // Log the successful response
         const repoUrl = response.data.clone_url;
         vscode.window.showInformationMessage(`GitHub repository created: ${repoUrl}`);
 
@@ -97,6 +101,7 @@ async function initializeGitRepo(accessToken: string) {
         vscode.window.showInformationMessage('Local Git repository initialized and remote added.');
     } catch (error) {
         vscode.window.showErrorMessage(`Error initializing Git repository: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        console.error('Error details:', error);  // Log detailed error information
         throw error;
     }
 }

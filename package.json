@@ -2,7 +2,7 @@
   "name": "codetrackr",
   "displayName": "CodeTrackr",
   "description": "A VS Code extension to track your coding activities.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "kianavega",
   "main": "./out/extension.js",
   "activationEvents": [
