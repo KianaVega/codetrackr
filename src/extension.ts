@@ -1,25 +1,25 @@
 import * as vscode from 'vscode';
 import fetch from 'node-fetch';
-import simpleGit, { SimpleGit } from 'simple-git';
+import simpleGit from 'simple-git';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Load environment variables
-const envPath = path.resolve(__dirname, '../.env'); // Ensure this points to the correct path
+// ✅ Set .env file path to the correct location
+const envPath = 'C:\\Users\\Kiana\\OneDrive - 4FRONT\\Desktop\\codetrackr\\.env';
+
+// ✅ Check if .env exists
 if (!fs.existsSync(envPath)) {
     console.error('🚨 ERROR: .env file missing at', envPath);
 } else {
-    dotenv.config({ path: envPath });  // Ensure dotenv loads the file from the correct path
-    console.log('✅ .env file loaded');
+    dotenv.config({ path: envPath });
+    console.log('✅ .env file loaded successfully!');
 }
 
-// Debugging the environment variables
+// Debugging: Print environment variables
 console.log('GITHUB_CLIENT_ID:', process.env.GITHUB_CLIENT_ID);
 console.log('GITHUB_CLIENT_SECRET:', process.env.GITHUB_CLIENT_SECRET);
 console.log('GITHUB_REDIRECT_URI:', process.env.GITHUB_REDIRECT_URI);
-console.log('Environment Variables:', process.env);
-
 
 // GitHub OAuth Configuration
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
@@ -30,7 +30,7 @@ if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
     throw new Error('Missing GitHub OAuth configuration in .env file.');
 }
 
-const git: SimpleGit = simpleGit();
+const git = simpleGit();
 let activityTimer: NodeJS.Timeout | undefined;
 
 // 🔹 GitHub Authentication
@@ -115,7 +115,7 @@ function startActivityTracking() {
         console.log('Committing activity summary...');
         try {
             await git.add('.');  // Stage all changes
-            await git.commit(`Auto-commit: ${new Date().toLocaleString()}`);  // Commit with the timestamp
+            await git.commit(`Auto-commit: ${new Date().toLocaleString()}`);  // Commit with timestamp
             await git.push('origin', 'main');  // Push to the remote
             vscode.window.showInformationMessage('Activity summary committed.');
         } catch (error) {
@@ -152,3 +152,5 @@ export function deactivate() {
         vscode.window.showInformationMessage('Activity tracking stopped.');
     }
 }
+
+

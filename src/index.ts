@@ -5,8 +5,8 @@ import fetch from 'node-fetch';
 import * as path from 'path';
 import simpleGit, { SimpleGit } from 'simple-git';
 
-// ✅ Set .env file path to your project root: C:\Users\Kiana\OneDrive - 4FRONT\Desktop\codetrackr
-const envPath = path.resolve(__dirname, '..', '.env');
+// ✅ Set .env file path to the correct location
+const envPath = 'C:\\Users\\Kiana\\OneDrive - 4FRONT\\Desktop\\codetrackr\\.env';
 
 // ✅ Check if .env exists
 if (!fs.existsSync(envPath)) {
@@ -115,10 +115,15 @@ function startActivityTracking() {
     activityTimer = setInterval(async () => {
         console.log('📌 Committing activity summary...');
         try {
-            await git.add('.');  // Stage all changes
-            await git.commit(`Auto-commit: ${new Date().toLocaleString()}`);  // Commit with timestamp
-            await git.push('origin', 'main');  // Push to GitHub
-            vscode.window.showInformationMessage('✅ Activity summary committed.');
+            const status = await git.status();
+            if (status.files.length > 0) {
+                await git.add('.');
+                await git.commit(`Auto-commit: ${new Date().toLocaleString()}`);
+                await git.push('origin', 'main');
+                vscode.window.showInformationMessage('✅ Activity summary committed.');
+            } else {
+                console.log('ℹ️ No changes to commit.');
+            }
         } catch (error) {
             vscode.window.showErrorMessage(`❌ Error committing activity summary: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
@@ -153,4 +158,5 @@ export function deactivate() {
         vscode.window.showInformationMessage('🛑 Activity tracking stopped.');
     }
 }
+
 
