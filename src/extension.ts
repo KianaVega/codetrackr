@@ -1,4 +1,5 @@
-import * as vscode from 'vscode'; 
+import * as vscode from 'vscode';
+import { Octokit } from '@octokit/rest';  // Updated import
 import fetch from 'node-fetch';
 import simpleGit from 'simple-git';
 import * as dotenv from 'dotenv';
@@ -79,12 +80,12 @@ async function authenticateWithGitHub() {
 async function initializeGitRepo(accessToken: string) {
     try {
         vscode.window.showInformationMessage('Creating GitHub repository...');
-        const { Octokit } = await import('@octokit/rest');
         const octokit = new Octokit({ auth: accessToken });
 
-        const response = await octokit.repos.createForAuthenticatedUser({
-            name: 'CodeTracking',
-            private: true,
+        // Create a repository named 'codetracking'
+        const response = await octokit.rest.repos.createForAuthenticatedUser({
+            name: 'codetracking',
+            private: true,  // Set to true for private repository
         });
 
         const repoUrl = response.data.clone_url;
@@ -152,5 +153,4 @@ export function deactivate() {
         vscode.window.showInformationMessage('Activity tracking stopped.');
     }
 }
-
 
