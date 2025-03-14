@@ -8,7 +8,6 @@
   "activationEvents": [
     "onCommand:codetrackr.initialize"
   ],
- "main": "./out/index.js", 
   "scripts": {
     "start": "code --extensionDevelopmentPath=./",
     "compile": "tsc -p ./ && if exist src\\.env copy src\\.env .\\out\\.env",
@@ -85,7 +84,6 @@
     "dotenv": "^16.4.7",
     "node-fetch": "^2.7.0",
     "simple-git": "^3.27.0"
-
   },
   "repository": {
     "type": "git",

@@ -10,8 +10,3 @@
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"javascript.preferences.importModuleSpecifier": "non-relative",
 	"typescript.preferences.importModuleSpecifier": "non-relative",
-
-	// Add GitHub Client ID and Secret for CodeTrackr
-	"codetrackr.githubClientId": "YOUR_CLIENT_ID",
-	"codetrackr.githubClientSecret": "YOUR_CLIENT_SECRET"
-}
