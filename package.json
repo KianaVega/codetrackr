@@ -5,9 +5,10 @@
   "version": "0.1.2",
   "publisher": "kianavega",
   "main": "./out/extension.js",
-  "activationEvents": [
-    "onCommand:codetrackr.initialize"
-  ],
+"activationEvents": [
+  "*",
+  "onCommand:codetrackr.initialize"
+],
   "scripts": {
     "start": "code --extensionDevelopmentPath=./",
     "compile": "tsc -p ./",
@@ -26,7 +27,8 @@
     "commands": [
       {
         "command": "codetrackr.initialize",
-        "title": "Initialize CodeTrackr"
+        "title": "Initialize CodeTrackr",
+        "category": "CodeTrackr"
       }
     ],
     "configuration": {

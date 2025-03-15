@@ -134,21 +134,27 @@ function startActivityTracking() {
 
 // 🔹 Activate Extension
 export function activate(context: vscode.ExtensionContext) {
+    console.log("CodeTrackr extension activating...");
+
     vscode.window.showInformationMessage('CodeTrackr extension activated!');
 
-    context.subscriptions.push(
-        vscode.commands.registerCommand('codetrackr.initialize', async () => {
-            try {
-                const accessToken = await authenticateWithGitHub();
-                if (accessToken) {
-                    await initializeGitRepo(accessToken);
-                    startActivityTracking();
-                }
-            } catch (error) {
-                vscode.window.showErrorMessage('An error occurred during initialization.');
+    const command = vscode.commands.registerCommand('codetrackr.initialize', async () => {
+        console.log("✅ codetrackr.initialize command executed.");
+        try {
+            const accessToken = await authenticateWithGitHub();
+            if (accessToken) {
+                await initializeGitRepo(accessToken);
+                startActivityTracking();
             }
-        })
-    );
+        } catch (error) {
+            console.error("❌ Initialization error:", error);
+            vscode.window.showErrorMessage('An error occurred during initialization.');
+        }
+    });
+
+    context.subscriptions.push(command);
+
+    console.log("✅ CodeTrackr initialize command registered.");
 }
 
 // 🔹 Deactivate Extension
