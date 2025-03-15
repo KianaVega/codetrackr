@@ -2,14 +2,13 @@
   "name": "codetrackr",
   "displayName": "CodeTrackr",
   "description": "A VS Code extension to track your coding activities.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "publisher": "kianavega",
   "main": "./out/extension.js",
 "activationEvents": [
-  "*",
+  "onStartupFinished",
   "onCommand:codetrackr.initialize"
-],
-  "scripts": {
+],  "scripts": {
     "start": "code --extensionDevelopmentPath=./",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
